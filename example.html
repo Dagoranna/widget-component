@@ -1,62 +1,140 @@
 <html>
 
 <head>
-    <title>Example</title>
-    <script src="index.js"></script>
+  <title>Example 3</title>
+  <script src="index.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    .wrapper{
+      display: flex;
+      flex: 1 0;
+    }
+    .qwenta{
+      display: block;
+      width: 100%;
+      height: 50px;
+    }
+    .container{
+      flex: 1 0;
+      height: calc( 100vh - 70px );
+      margin: 10px;
+      border-radius: 10px;
+      text-align: center;   
+      display: flex;   
+      flex-wrap: wrap;
+      overflow-y: auto;
+      align-content: flex-start;
+    }
+    #container1{
+      border: 2px solid lawngreen;
+      box-shadow: 0 0 15px lawngreen inset;
+    }    
+    #container2{
+      border: 2px solid DeepSkyBlue;
+      box-shadow: 0 0 15px DeepSkyBlue inset;
+    }      
+
+    .bubble {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 2px solid red;
+      background: radial-gradient(white 0%, red 100%);
+      text-align: center;
+      margin: 10px;
+      line-height: 80px;
+    }
+
+  </style>
 </head>
 
 <body>
+  <script>
+    var counter=0;
 
-    <script>
-        const taskListContainer = HtmlElement.create('div')
-            .addId('task-list-container')
-            .addClass('list-wrapper')
-            .addChild({
-                elem: 'input',
-                id: 'search-input',
-                type: 'change',
-                callback: function (event) {
-                    console.log(event.target.value);
-                }
-            })
-            .addChild({
-                elem: 'ul',
-                id: 'task-list',
-                classes: [
-                    'list',
-                    'card-container',
-                ],
-            });
-        taskListContainer.getChild('#task-list')
-            .addChild({
-                elem: 'li',
-                id: 'task-1',
-                classes: [
-                    'task-list-item',
-                    'card',
-                ],
-                textContent: 'Task 1',
-                type: 'click',
-                callback: function () {
-                    alert('Click event on Task 1');
-                }
-            }).
-            addChild(
-                {
-                    elem: 'li',
-                    id: 'task-2',
-                    classes: [
-                        'task-list-item',
-                        'card',
-                    ],
-                    type: 'click',
-                    textContent: 'Task 2',
-                    callback: function () {
-                        alert('Click event on Task 1');
-                    }
-                });
-        taskListContainer.appendTo(document.querySelector('body'));
-    </script>
+    HtmlElement.create({type: 'script', attrs: {
+      src: "scripts_2.js",
+      defer: ""
+    }}).appendTo(document.head);
+
+    const qwenta = HtmlElement.create({type: 'div', id: 'qwenta', classes: 'qwenta'}).appendTo(document.body);
+    qwenta
+      .addChild({type: 'button', value: 'add shadow styles', events:{
+        click: (e) => {
+          e.stopPropagation();    
+          HtmlElement.create({type: 'link', attrs: {
+            rel: "stylesheet",
+            href: "styles_2.css"
+          }}).appendTo(document.head);          
+        }
+      }})
+      .addChild({type: 'input'}).addChild({type: 'button', value: 'remove this bubble', events: {
+        click: (e) => {
+          e.stopPropagation();
+          let idForRemove = document.querySelector("#qwenta input").value;
+          removeBubble(idForRemove);
+        }
+      }})
+      .addChild({type: 'div', id: 'bubble_ind'});
+
+    const mainWrapper = HtmlElement.create({type: 'div', id: 'mainWrapper', classes: 'wrapper'});
+    mainWrapper.appendTo(document.body);
+
+    mainWrapper.addChild({type: 'div', id: 'container1', classes: 'container'})
+    .addChild({type: 'div', id: 'container2', classes: 'container'});
+
+    function createBubble(containerNum){
+      HtmlElement.create({type: 'div', classes: 'bubble', id: `bubble_${counter++}`, value: `bubble_${counter-1}`, events: {
+        click: (e) => {
+          e.stopPropagation();
+
+          if (containerNum === "#container1") {
+            createBubble("#container2");
+          } else {
+            createBubble("#container1");
+          }
+        },
+        mouseover: (e) => {
+          e.stopPropagation();
+          e.currentTarget.style.borderColor="blue";
+          document.getElementById("bubble_ind").textContent = "bubble hovered: " + e.currentTarget.id;
+        },
+        mouseout: (e) => {
+          e.stopPropagation();
+          e.currentTarget.style.borderColor="red";
+          document.getElementById("bubble_ind").textContent = "";
+        }      
+      }})
+      .addChild({type: 'button', value: 'del', events: {
+        click: (e) => {
+          e.stopPropagation();
+          e.currentTarget.parentNode.remove();
+        }
+      }})
+      .addChild({type: 'button', value: 'move', events: {
+        click: (e) => {
+          e.stopPropagation();
+          let currentParent = e.currentTarget.closest('.container');
+          if (currentParent.id === "container1") {
+            document.getElementById("container2").appendChild(e.currentTarget.parentNode);
+            
+          } else if (currentParent.id === "container2"){
+            document.getElementById("container1").appendChild(e.currentTarget.parentNode);
+          }
+        }
+      }})
+      .appendTo(document.querySelector(containerNum));  
+    }
+     
+    createBubble("#container1");
+      
+ 
+  </script>
 </body>
 
 </html>
